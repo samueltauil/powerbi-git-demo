@@ -65,9 +65,36 @@ table Date
 			sourceLineageTag: 5730c2a5-ef6f-4b85-969f-dbdff05407e7
 			column: Year
 
-	partition Date = entity
-		mode: directQuery
-		source
-			entityName: Date
-			expressionSource: 'DirectQuery to AS - 16-Starter-Sales Analysis'
+	partition Date = m
+		mode: import
+		source =
+				let
+				    Source = Table.FromRecords({
+				        [Date = #datetime(2022, 1, 1, 0, 0, 0), Year = "CY2022", Quarter = "Qtr1", Month = "January", MonthKey = 202201],
+				        [Date = #datetime(2022, 2, 1, 0, 0, 0), Year = "CY2022", Quarter = "Qtr1", Month = "February", MonthKey = 202202],
+				        [Date = #datetime(2022, 3, 1, 0, 0, 0), Year = "CY2022", Quarter = "Qtr1", Month = "March", MonthKey = 202203],
+				        [Date = #datetime(2022, 4, 1, 0, 0, 0), Year = "CY2022", Quarter = "Qtr2", Month = "April", MonthKey = 202204],
+				        [Date = #datetime(2022, 5, 1, 0, 0, 0), Year = "CY2022", Quarter = "Qtr2", Month = "May", MonthKey = 202205],
+				        [Date = #datetime(2022, 6, 1, 0, 0, 0), Year = "CY2022", Quarter = "Qtr2", Month = "June", MonthKey = 202206],
+				        [Date = #datetime(2022, 7, 1, 0, 0, 0), Year = "CY2022", Quarter = "Qtr3", Month = "July", MonthKey = 202207],
+				        [Date = #datetime(2022, 8, 1, 0, 0, 0), Year = "CY2022", Quarter = "Qtr3", Month = "August", MonthKey = 202208],
+				        [Date = #datetime(2022, 9, 1, 0, 0, 0), Year = "CY2022", Quarter = "Qtr3", Month = "September", MonthKey = 202209],
+				        [Date = #datetime(2022, 10, 1, 0, 0, 0), Year = "CY2022", Quarter = "Qtr4", Month = "October", MonthKey = 202210],
+				        [Date = #datetime(2022, 11, 1, 0, 0, 0), Year = "CY2022", Quarter = "Qtr4", Month = "November", MonthKey = 202211],
+				        [Date = #datetime(2022, 12, 1, 0, 0, 0), Year = "CY2022", Quarter = "Qtr4", Month = "December", MonthKey = 202212],
+				        [Date = #datetime(2023, 1, 1, 0, 0, 0), Year = "CY2023", Quarter = "Qtr1", Month = "January", MonthKey = 202301],
+				        [Date = #datetime(2023, 2, 1, 0, 0, 0), Year = "CY2023", Quarter = "Qtr1", Month = "February", MonthKey = 202302],
+				        [Date = #datetime(2023, 3, 1, 0, 0, 0), Year = "CY2023", Quarter = "Qtr1", Month = "March", MonthKey = 202303],
+				        [Date = #datetime(2023, 4, 1, 0, 0, 0), Year = "CY2023", Quarter = "Qtr2", Month = "April", MonthKey = 202304],
+				        [Date = #datetime(2023, 5, 1, 0, 0, 0), Year = "CY2023", Quarter = "Qtr2", Month = "May", MonthKey = 202305],
+				        [Date = #datetime(2023, 6, 1, 0, 0, 0), Year = "CY2023", Quarter = "Qtr2", Month = "June", MonthKey = 202306],
+				        [Date = #datetime(2023, 7, 1, 0, 0, 0), Year = "CY2023", Quarter = "Qtr3", Month = "July", MonthKey = 202307],
+				        [Date = #datetime(2023, 8, 1, 0, 0, 0), Year = "CY2023", Quarter = "Qtr3", Month = "August", MonthKey = 202308],
+				        [Date = #datetime(2023, 9, 1, 0, 0, 0), Year = "CY2023", Quarter = "Qtr3", Month = "September", MonthKey = 202309],
+				        [Date = #datetime(2023, 10, 1, 0, 0, 0), Year = "CY2023", Quarter = "Qtr4", Month = "October", MonthKey = 202310],
+				        [Date = #datetime(2023, 11, 1, 0, 0, 0), Year = "CY2023", Quarter = "Qtr4", Month = "November", MonthKey = 202311],
+				        [Date = #datetime(2023, 12, 1, 0, 0, 0), Year = "CY2023", Quarter = "Qtr4", Month = "December", MonthKey = 202312]
+				    }, type table [Date = DateTime.Type, Year = Text.Type, Quarter = Text.Type, Month = Text.Type, MonthKey = Int64.Type])
+				in
+				    Source
 

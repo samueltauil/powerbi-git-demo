@@ -103,9 +103,20 @@ table Reseller
 			sourceLineageTag: 81d9a1b5-da16-4b32-bf19-f4f6bc8bdb76
 			column: Reseller
 
-	partition Reseller = entity
-		mode: directQuery
-		source
-			entityName: Reseller
-			expressionSource: 'DirectQuery to AS - 16-Starter-Sales Analysis'
+	partition Reseller = m
+		mode: import
+		source =
+				let
+				    Source = Table.FromRecords({
+				        [ResellerKey = 1, #"Business Type" = "Specialty Bike Shop", Reseller = "Westside Parts & Service", City = "Portland", #"State-Province" = "Oregon", #"Country-Region" = "United States"],
+				        [ResellerKey = 2, #"Business Type" = "Value Added Reseller", Reseller = "Rocky Mountain Cycles", City = "Calgary", #"State-Province" = "Alberta", #"Country-Region" = "Canada"],
+				        [ResellerKey = 3, #"Business Type" = "Warehouse", Reseller = "Cycling World", City = "Melbourne", #"State-Province" = "Victoria", #"Country-Region" = "Australia"],
+				        [ResellerKey = 4, #"Business Type" = "Specialty Bike Shop", Reseller = "Racecourse Cycling", City = "London", #"State-Province" = "England", #"Country-Region" = "United Kingdom"],
+				        [ResellerKey = 5, #"Business Type" = "Value Added Reseller", Reseller = "Continental Bikes", City = "Berlin", #"State-Province" = "Brandenburg", #"Country-Region" = "Germany"],
+				        [ResellerKey = 6, #"Business Type" = "Specialty Bike Shop", Reseller = "Pacific Bike Co", City = "Seattle", #"State-Province" = "Washington", #"Country-Region" = "United States"],
+				        [ResellerKey = 7, #"Business Type" = "Value Added Reseller", Reseller = "Lone Star Cycles", City = "Houston", #"State-Province" = "Texas", #"Country-Region" = "United States"],
+				        [ResellerKey = 8, #"Business Type" = "Warehouse", Reseller = "Southern Cycle Supply", City = "Atlanta", #"State-Province" = "Georgia", #"Country-Region" = "United States"]
+				    }, type table [ResellerKey = Int64.Type, #"Business Type" = Text.Type, Reseller = Text.Type, City = Text.Type, #"State-Province" = Text.Type, #"Country-Region" = Text.Type])
+				in
+				    Source
 

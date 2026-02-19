@@ -22,14 +22,20 @@ table 'US Population'
 		mode: import
 		source =
 				let
-				    Source = File.Contents("C:\Users\anrudduc\learn-pr\Self-Publishing\reusable assets lab\OLD\starter from scratch\us-resident-population-estimates-2020.html"),
-				    #"Extracted Table From Html" = Html.Table(Source, {{"Column1", "TABLE:nth-child(3) > * > TR > :nth-child(1)"}, {"Column2", "TABLE:nth-child(3) > * > TR > :nth-child(2)"}, {"Column3", "TABLE:nth-child(3) > * > TR > :nth-child(3)"}}, [RowSelector="TABLE:nth-child(3) > * > TR"]),
-				    #"Promoted Headers" = Table.PromoteHeaders(#"Extracted Table From Html", [PromoteAllScalars=true]),
-				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"STATE", type text}, {"NUMBER", Int64.Type}, {"RANK", type text}}),
-				    #"Removed Columns" = Table.RemoveColumns(#"Changed Type",{"RANK"}),
-				    #"Renamed Columns" = Table.RenameColumns(#"Removed Columns",{{"NUMBER", "Population"}, {"STATE", "State"}})
+				    Source = Table.FromRecords({
+				        [State = "Oregon", Population = 4237256],
+				        [State = "Washington", Population = 7738692],
+				        [State = "Texas", Population = 29145505],
+				        [State = "Georgia", Population = 10711908],
+				        [State = "California", Population = 39538223],
+				        [State = "New York", Population = 20201249],
+				        [State = "Florida", Population = 21538187],
+				        [State = "Illinois", Population = 12812508],
+				        [State = "Ohio", Population = 11799448],
+				        [State = "Pennsylvania", Population = 13002700]
+				    }, type table [State = Text.Type, Population = Int64.Type])
 				in
-				    #"Renamed Columns"
+				    Source
 
 	annotation PBI_NavigationStepName = Navigation
 

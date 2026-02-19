@@ -64,9 +64,22 @@ table Region
 			sourceLineageTag: f48dfa0d-4137-4515-9035-fc5a61d3eacb
 			column: Region
 
-	partition Region = entity
-		mode: directQuery
-		source
-			entityName: Region
-			expressionSource: 'DirectQuery to AS - 16-Starter-Sales Analysis'
+	partition Region = m
+		mode: import
+		source =
+				let
+				    Source = Table.FromRecords({
+				        [SalesTerritoryKey = 1, Region = "Australia", Country = "Australia", Group = "Pacific"],
+				        [SalesTerritoryKey = 2, Region = "Canada", Country = "Canada", Group = "North America"],
+				        [SalesTerritoryKey = 3, Region = "Central", Country = "United States", Group = "North America"],
+				        [SalesTerritoryKey = 4, Region = "France", Country = "France", Group = "Europe"],
+				        [SalesTerritoryKey = 5, Region = "Germany", Country = "Germany", Group = "Europe"],
+				        [SalesTerritoryKey = 6, Region = "Northeast", Country = "United States", Group = "North America"],
+				        [SalesTerritoryKey = 7, Region = "Northwest", Country = "United States", Group = "North America"],
+				        [SalesTerritoryKey = 8, Region = "Southeast", Country = "United States", Group = "North America"],
+				        [SalesTerritoryKey = 9, Region = "Southwest", Country = "United States", Group = "North America"],
+				        [SalesTerritoryKey = 10, Region = "United Kingdom", Country = "United Kingdom", Group = "Europe"]
+				    }, type table [SalesTerritoryKey = Int64.Type, Region = Text.Type, Country = Text.Type, Group = Text.Type])
+				in
+				    Source
 

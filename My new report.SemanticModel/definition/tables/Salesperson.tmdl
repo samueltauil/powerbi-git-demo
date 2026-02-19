@@ -61,9 +61,20 @@ table Salesperson
 
 		annotation SummarizationSetBy = User
 
-	partition Salesperson = entity
-		mode: directQuery
-		source
-			entityName: Salesperson
-			expressionSource: 'DirectQuery to AS - 16-Starter-Sales Analysis'
+	partition Salesperson = m
+		mode: import
+		source =
+				let
+				    Source = Table.FromRecords({
+				        [EmployeeKey = 1, EmployeeID = 272, Title = "Sales Representative", UPN = "michael9@adventure-works.com", Salesperson = "Michael Blythe"],
+				        [EmployeeKey = 2, EmployeeID = 281, Title = "Sales Representative", UPN = "linda3@adventure-works.com", Salesperson = "Linda Mitchell"],
+				        [EmployeeKey = 3, EmployeeID = 282, Title = "Sales Representative", UPN = "jillian0@adventure-works.com", Salesperson = "Jillian Carson"],
+				        [EmployeeKey = 4, EmployeeID = 283, Title = "Sales Representative", UPN = "garret1@adventure-works.com", Salesperson = "Garrett Vargas"],
+				        [EmployeeKey = 5, EmployeeID = 284, Title = "Sales Representative", UPN = "tsvi0@adventure-works.com", Salesperson = "Tsvi Reiter"],
+				        [EmployeeKey = 6, EmployeeID = 285, Title = "Sales Representative", UPN = "pamela0@adventure-works.com", Salesperson = "Pamela Ansman-Wolfe"],
+				        [EmployeeKey = 7, EmployeeID = 286, Title = "Sales Representative", UPN = "shu0@adventure-works.com", Salesperson = "Shu Ito"],
+				        [EmployeeKey = 8, EmployeeID = 290, Title = "Sales Representative", UPN = "jose1@adventure-works.com", Salesperson = "Jose Saraiva"]
+				    }, type table [EmployeeKey = Int64.Type, EmployeeID = Int64.Type, Title = Text.Type, UPN = Text.Type, Salesperson = Text.Type])
+				in
+				    Source
 

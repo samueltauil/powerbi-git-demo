@@ -2,75 +2,75 @@ table Sales
 	lineageTag: d011e21c-3913-493a-b6fd-5022a2c14e7d
 	sourceLineageTag: c90c54c3-ecc7-4006-acae-213e629b2b9e
 
-	measure Profit = EXTERNALMEASURE("Profit", CURRENCY, "DirectQuery to AS - 16-Starter-Sales Analysis")
+	measure Profit = SUM(Sales[Sales]) - SUM(Sales[Cost])
 		formatString: \$#,0;(\$#,0);\$#,0
 		lineageTag: f5b89451-737b-47aa-808c-45d229f927cc
 		sourceLineageTag: e9392e16-8287-4a63-8f98-14ddbc88ec6d
 		dataCategory: Uncategorized
 
-	measure 'Profit Margin' = EXTERNALMEASURE("Profit Margin", DOUBLE, "DirectQuery to AS - 16-Starter-Sales Analysis")
+	measure 'Profit Margin' = DIVIDE([Profit], SUM(Sales[Sales]))
 		formatString: #,0.00%;-#,0.00%;#,0.00%
 		lineageTag: 2365c808-8b7d-46b6-b24a-8a13cbba8746
 		sourceLineageTag: 6dcf0ce0-a21f-454e-8857-7bf5e2b7b031
 		dataCategory: Uncategorized
 
-	measure 'Avg Price' = EXTERNALMEASURE("Avg Price", CURRENCY, "DirectQuery to AS - 16-Starter-Sales Analysis")
+	measure 'Avg Price' = AVERAGE(Sales[Unit Price])
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		displayFolder: Pricing
 		lineageTag: 9bcfa08f-1bf3-49d8-b35d-5dad67a2f666
 		sourceLineageTag: 9ca76f2a-b132-4cb0-813c-f4e65d5f9c71
 		dataCategory: Uncategorized
 
-	measure 'Median Price' = EXTERNALMEASURE("Median Price", CURRENCY, "DirectQuery to AS - 16-Starter-Sales Analysis")
+	measure 'Median Price' = MEDIAN(Sales[Unit Price])
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		displayFolder: Pricing
 		lineageTag: d68aa176-2c6e-4404-a0a4-a31d13a4f388
 		sourceLineageTag: 22c94527-a543-4638-8cf7-fb934808620e
 		dataCategory: Uncategorized
 
-	measure 'Min Price' = EXTERNALMEASURE("Min Price", CURRENCY, "DirectQuery to AS - 16-Starter-Sales Analysis")
+	measure 'Min Price' = MIN(Sales[Unit Price])
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		displayFolder: Pricing
 		lineageTag: a8fca671-da86-48a7-842f-176b7c4d9fdb
 		sourceLineageTag: 94d285a5-58ae-40fb-98dd-29b64a058507
 		dataCategory: Uncategorized
 
-	measure 'Max Price' = EXTERNALMEASURE("Max Price", CURRENCY, "DirectQuery to AS - 16-Starter-Sales Analysis")
+	measure 'Max Price' = MAX(Sales[Unit Price])
 		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		displayFolder: Pricing
 		lineageTag: d48c8467-4a85-4ef6-afe1-249de8c38e5c
 		sourceLineageTag: 793f0df1-015b-4908-b5bd-aefbd1dfdb62
 		dataCategory: Uncategorized
 
-	measure Orders = EXTERNALMEASURE("Orders", INTEGER, "DirectQuery to AS - 16-Starter-Sales Analysis")
+	measure Orders = DISTINCTCOUNT(Sales[SalesOrderNumber])
 		formatString: 0
 		displayFolder: Counts
 		lineageTag: 4fb79728-a93b-4fa8-b114-d53b49b59898
 		sourceLineageTag: 57f38fd6-cf9a-4d06-a7ee-1a306043c61b
 		dataCategory: Uncategorized
 
-	measure 'Order Lines' = EXTERNALMEASURE("Order Lines", INTEGER, "DirectQuery to AS - 16-Starter-Sales Analysis")
+	measure 'Order Lines' = COUNTROWS(Sales)
 		formatString: 0
 		displayFolder: Counts
 		lineageTag: 4d5dff7c-93b6-4231-9131-25e4e346ef46
 		sourceLineageTag: da03adc1-acfb-4d73-9aaa-b5e373c5e88f
 		dataCategory: Uncategorized
 
-	measure 'Sales % All Region' = EXTERNALMEASURE("Sales % All Region", DOUBLE, "DirectQuery to AS - 16-Starter-Sales Analysis")
+	measure 'Sales % All Region' = DIVIDE(SUM(Sales[Sales]), CALCULATE(SUM(Sales[Sales]), ALL(Region)))
 		formatString: 0.00%;-0.00%;0.00%
 		displayFolder: Ratios
 		lineageTag: 8ffba007-60e8-44ea-9c67-d4ab7213dce5
 		sourceLineageTag: 008e9ca5-2758-43de-9595-76282e69f31d
 		dataCategory: Uncategorized
 
-	measure 'Sales % Country' = EXTERNALMEASURE("Sales % Country", DOUBLE, "DirectQuery to AS - 16-Starter-Sales Analysis")
+	measure 'Sales % Country' = DIVIDE(SUM(Sales[Sales]), CALCULATE(SUM(Sales[Sales]), ALLEXCEPT(Region, Region[Group], Region[Country])))
 		formatString: 0.00%;-0.00%;0.00%
 		displayFolder: Ratios
 		lineageTag: f19a72b2-708f-41c6-bb5c-7eb6d1913698
 		sourceLineageTag: 954e603d-5c04-4a90-ad4c-8f34b04ea323
 		dataCategory: Uncategorized
 
-	measure 'Sales % Group' = EXTERNALMEASURE("Sales % Group", DOUBLE, "DirectQuery to AS - 16-Starter-Sales Analysis")
+	measure 'Sales % Group' = DIVIDE(SUM(Sales[Sales]), CALCULATE(SUM(Sales[Sales]), ALLEXCEPT(Region, Region[Group])))
 		displayFolder: Ratios
 		lineageTag: a0178da3-679c-4e41-8fc7-87132d7b59f0
 		sourceLineageTag: 565a0642-ff70-4055-95e3-f5233d204ae8
@@ -78,14 +78,16 @@ table Sales
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	measure 'Sales YTD' = EXTERNALMEASURE("Sales YTD", CURRENCY, "DirectQuery to AS - 16-Starter-Sales Analysis")
+	measure 'Sales YTD' = TOTALYTD(SUM(Sales[Sales]), 'Date'[Date])
 		formatString: \$#,0;(\$#,0);\$#,0
 		displayFolder: Time Intelligence
 		lineageTag: ccc1d7bc-af20-49c7-9e9b-ac44d6c367f0
 		sourceLineageTag: a9440108-f6a0-4e23-b6c9-9fa7662ff79b
 		dataCategory: Uncategorized
 
-	measure 'Sales YoY Growth' = EXTERNALMEASURE("Sales YoY Growth", DOUBLE, "DirectQuery to AS - 16-Starter-Sales Analysis")
+	measure 'Sales YoY Growth' =
+			VAR SalesPriorYear = CALCULATE(SUM(Sales[Sales]), SAMEPERIODLASTYEAR('Date'[Date]))
+			RETURN DIVIDE(SUM(Sales[Sales]) - SalesPriorYear, SalesPriorYear)
 		formatString: 0.00%;-0.00%;0.00%
 		displayFolder: Time Intelligence
 		lineageTag: 01e5408a-0d93-4ce4-868b-e7ac0af695d2
@@ -225,9 +227,44 @@ table Sales
 
 		annotation SummarizationSetBy = User
 
-	partition Sales = entity
-		mode: directQuery
-		source
-			entityName: Sales
-			expressionSource: 'DirectQuery to AS - 16-Starter-Sales Analysis'
+	partition Sales = m
+		mode: import
+		source =
+				let
+				    Source = Table.FromRecords({
+				        [SalesOrderNumber = "SO-0001", OrderDate = #datetime(2022, 1, 1, 0, 0, 0), ProductKey = 4, ResellerKey = 2, EmployeeKey = 1, SalesTerritoryKey = 2, Quantity = 2, #"Unit Price" = 3578.27, Sales = 7156.54, Cost = 4342.58],
+				        [SalesOrderNumber = "SO-0002", OrderDate = #datetime(2022, 1, 1, 0, 0, 0), ProductKey = 5, ResellerKey = 1, EmployeeKey = 2, SalesTerritoryKey = 3, Quantity = 3, #"Unit Price" = 3190.00, Sales = 9570.00, Cost = 5736.45],
+				        [SalesOrderNumber = "SO-0003", OrderDate = #datetime(2022, 1, 1, 0, 0, 0), ProductKey = 6, ResellerKey = 3, EmployeeKey = 4, SalesTerritoryKey = 1, Quantity = 1, #"Unit Price" = 3598.00, Sales = 3598.00, Cost = 2146.96],
+				        [SalesOrderNumber = "SO-0004", OrderDate = #datetime(2022, 4, 1, 0, 0, 0), ProductKey = 4, ResellerKey = 4, EmployeeKey = 3, SalesTerritoryKey = 4, Quantity = 4, #"Unit Price" = 3578.27, Sales = 14313.08, Cost = 8685.16],
+				        [SalesOrderNumber = "SO-0005", OrderDate = #datetime(2022, 4, 1, 0, 0, 0), ProductKey = 5, ResellerKey = 5, EmployeeKey = 5, SalesTerritoryKey = 5, Quantity = 2, #"Unit Price" = 3190.00, Sales = 6380.00, Cost = 3824.30],
+				        [SalesOrderNumber = "SO-0006", OrderDate = #datetime(2022, 4, 1, 0, 0, 0), ProductKey = 2, ResellerKey = 7, EmployeeKey = 6, SalesTerritoryKey = 6, Quantity = 20, #"Unit Price" = 34.99, Sales = 699.80, Cost = 261.80],
+				        [SalesOrderNumber = "SO-0007", OrderDate = #datetime(2022, 7, 1, 0, 0, 0), ProductKey = 4, ResellerKey = 6, EmployeeKey = 7, SalesTerritoryKey = 7, Quantity = 5, #"Unit Price" = 3578.27, Sales = 17891.35, Cost = 10856.45],
+				        [SalesOrderNumber = "SO-0008", OrderDate = #datetime(2022, 7, 1, 0, 0, 0), ProductKey = 6, ResellerKey = 8, EmployeeKey = 8, SalesTerritoryKey = 8, Quantity = 3, #"Unit Price" = 3598.00, Sales = 10794.00, Cost = 6440.88],
+				        [SalesOrderNumber = "SO-0009", OrderDate = #datetime(2022, 7, 1, 0, 0, 0), ProductKey = 1, ResellerKey = 4, EmployeeKey = 3, SalesTerritoryKey = 4, Quantity = 100, #"Unit Price" = 8.99, Sales = 899.00, Cost = 692.20],
+				        [SalesOrderNumber = "SO-0010", OrderDate = #datetime(2022, 10, 1, 0, 0, 0), ProductKey = 5, ResellerKey = 1, EmployeeKey = 2, SalesTerritoryKey = 3, Quantity = 4, #"Unit Price" = 3190.00, Sales = 12760.00, Cost = 7648.60],
+				        [SalesOrderNumber = "SO-0011", OrderDate = #datetime(2022, 10, 1, 0, 0, 0), ProductKey = 4, ResellerKey = 5, EmployeeKey = 5, SalesTerritoryKey = 5, Quantity = 3, #"Unit Price" = 3578.27, Sales = 10734.81, Cost = 6513.87],
+				        [SalesOrderNumber = "SO-0012", OrderDate = #datetime(2022, 10, 1, 0, 0, 0), ProductKey = 6, ResellerKey = 2, EmployeeKey = 1, SalesTerritoryKey = 2, Quantity = 2, #"Unit Price" = 3598.00, Sales = 7196.00, Cost = 4293.92],
+				        [SalesOrderNumber = "SO-0013", OrderDate = #datetime(2022, 10, 1, 0, 0, 0), ProductKey = 3, ResellerKey = 7, EmployeeKey = 6, SalesTerritoryKey = 6, Quantity = 50, #"Unit Price" = 9.50, Sales = 475.00, Cost = 170.00],
+				        [SalesOrderNumber = "SO-0014", OrderDate = #datetime(2023, 1, 1, 0, 0, 0), ProductKey = 4, ResellerKey = 4, EmployeeKey = 3, SalesTerritoryKey = 4, Quantity = 6, #"Unit Price" = 3578.27, Sales = 21469.62, Cost = 13027.74],
+				        [SalesOrderNumber = "SO-0015", OrderDate = #datetime(2023, 1, 1, 0, 0, 0), ProductKey = 5, ResellerKey = 3, EmployeeKey = 4, SalesTerritoryKey = 1, Quantity = 4, #"Unit Price" = 3190.00, Sales = 12760.00, Cost = 7648.60],
+				        [SalesOrderNumber = "SO-0016", OrderDate = #datetime(2023, 1, 1, 0, 0, 0), ProductKey = 6, ResellerKey = 6, EmployeeKey = 7, SalesTerritoryKey = 7, Quantity = 5, #"Unit Price" = 3598.00, Sales = 17990.00, Cost = 10734.80],
+				        [SalesOrderNumber = "SO-0017", OrderDate = #datetime(2023, 1, 1, 0, 0, 0), ProductKey = 4, ResellerKey = 5, EmployeeKey = 5, SalesTerritoryKey = 5, Quantity = 3, #"Unit Price" = 3578.27, Sales = 10734.81, Cost = 6513.87],
+				        [SalesOrderNumber = "SO-0018", OrderDate = #datetime(2023, 4, 1, 0, 0, 0), ProductKey = 5, ResellerKey = 2, EmployeeKey = 1, SalesTerritoryKey = 2, Quantity = 5, #"Unit Price" = 3190.00, Sales = 15950.00, Cost = 9560.75],
+				        [SalesOrderNumber = "SO-0019", OrderDate = #datetime(2023, 4, 1, 0, 0, 0), ProductKey = 6, ResellerKey = 4, EmployeeKey = 3, SalesTerritoryKey = 4, Quantity = 4, #"Unit Price" = 3598.00, Sales = 14392.00, Cost = 8587.84],
+				        [SalesOrderNumber = "SO-0020", OrderDate = #datetime(2023, 4, 1, 0, 0, 0), ProductKey = 4, ResellerKey = 1, EmployeeKey = 2, SalesTerritoryKey = 3, Quantity = 7, #"Unit Price" = 3578.27, Sales = 25047.89, Cost = 15199.03],
+				        [SalesOrderNumber = "SO-0021", OrderDate = #datetime(2023, 4, 1, 0, 0, 0), ProductKey = 2, ResellerKey = 5, EmployeeKey = 5, SalesTerritoryKey = 5, Quantity = 30, #"Unit Price" = 34.99, Sales = 1049.70, Cost = 392.70],
+				        [SalesOrderNumber = "SO-0022", OrderDate = #datetime(2023, 7, 1, 0, 0, 0), ProductKey = 5, ResellerKey = 3, EmployeeKey = 4, SalesTerritoryKey = 1, Quantity = 6, #"Unit Price" = 3190.00, Sales = 19140.00, Cost = 11472.90],
+				        [SalesOrderNumber = "SO-0023", OrderDate = #datetime(2023, 7, 1, 0, 0, 0), ProductKey = 4, ResellerKey = 7, EmployeeKey = 6, SalesTerritoryKey = 6, Quantity = 4, #"Unit Price" = 3578.27, Sales = 14313.08, Cost = 8685.16],
+				        [SalesOrderNumber = "SO-0024", OrderDate = #datetime(2023, 7, 1, 0, 0, 0), ProductKey = 6, ResellerKey = 2, EmployeeKey = 1, SalesTerritoryKey = 2, Quantity = 3, #"Unit Price" = 3598.00, Sales = 10794.00, Cost = 6440.88],
+				        [SalesOrderNumber = "SO-0025", OrderDate = #datetime(2023, 7, 1, 0, 0, 0), ProductKey = 5, ResellerKey = 5, EmployeeKey = 5, SalesTerritoryKey = 5, Quantity = 4, #"Unit Price" = 3190.00, Sales = 12760.00, Cost = 7648.60],
+				        [SalesOrderNumber = "SO-0026", OrderDate = #datetime(2023, 7, 1, 0, 0, 0), ProductKey = 1, ResellerKey = 4, EmployeeKey = 3, SalesTerritoryKey = 4, Quantity = 200, #"Unit Price" = 8.99, Sales = 1798.00, Cost = 1384.40],
+				        [SalesOrderNumber = "SO-0027", OrderDate = #datetime(2023, 10, 1, 0, 0, 0), ProductKey = 4, ResellerKey = 8, EmployeeKey = 8, SalesTerritoryKey = 8, Quantity = 5, #"Unit Price" = 3578.27, Sales = 17891.35, Cost = 10856.45],
+				        [SalesOrderNumber = "SO-0028", OrderDate = #datetime(2023, 10, 1, 0, 0, 0), ProductKey = 6, ResellerKey = 6, EmployeeKey = 7, SalesTerritoryKey = 7, Quantity = 6, #"Unit Price" = 3598.00, Sales = 21588.00, Cost = 12881.76],
+				        [SalesOrderNumber = "SO-0029", OrderDate = #datetime(2023, 10, 1, 0, 0, 0), ProductKey = 5, ResellerKey = 2, EmployeeKey = 1, SalesTerritoryKey = 2, Quantity = 4, #"Unit Price" = 3190.00, Sales = 12760.00, Cost = 7648.60],
+				        [SalesOrderNumber = "SO-0030", OrderDate = #datetime(2023, 10, 1, 0, 0, 0), ProductKey = 3, ResellerKey = 5, EmployeeKey = 5, SalesTerritoryKey = 5, Quantity = 100, #"Unit Price" = 9.50, Sales = 950.00, Cost = 340.00],
+				        [SalesOrderNumber = "SO-0031", OrderDate = #datetime(2023, 10, 1, 0, 0, 0), ProductKey = 4, ResellerKey = 4, EmployeeKey = 3, SalesTerritoryKey = 4, Quantity = 8, #"Unit Price" = 3578.27, Sales = 28626.16, Cost = 17370.32],
+				        [SalesOrderNumber = "SO-0032", OrderDate = #datetime(2023, 10, 1, 0, 0, 0), ProductKey = 5, ResellerKey = 3, EmployeeKey = 4, SalesTerritoryKey = 1, Quantity = 5, #"Unit Price" = 3190.00, Sales = 15950.00, Cost = 9560.75]
+				    }, type table [SalesOrderNumber = Text.Type, OrderDate = DateTime.Type, ProductKey = Int64.Type, ResellerKey = Int64.Type, EmployeeKey = Int64.Type, SalesTerritoryKey = Int64.Type, Quantity = Int64.Type, #"Unit Price" = Decimal.Type, Sales = Decimal.Type, Cost = Decimal.Type])
+				in
+				    Source
 

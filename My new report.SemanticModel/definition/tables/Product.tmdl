@@ -107,9 +107,18 @@ table Product
 			sourceLineageTag: fa0b3f0a-effa-4751-b9a6-d8793722513b
 			column: Product
 
-	partition Product = entity
-		mode: directQuery
-		source
-			entityName: Product
-			expressionSource: 'DirectQuery to AS - 16-Starter-Sales Analysis'
+	partition Product = m
+		mode: import
+		source =
+				let
+				    Source = Table.FromRecords({
+				        [ProductKey = 1, Product = "AWC Logo Cap", #"Standard Cost" = 6.92, Color = "Black", Subcategory = "Caps", Category = "Accessories", #"Background Color Format" = "White", #"Font Color Format" = "Black"],
+				        [ProductKey = 2, Product = "Sport-100 Helmet, Red", #"Standard Cost" = 13.09, Color = "Red", Subcategory = "Helmets", Category = "Accessories", #"Background Color Format" = "#CC3300", #"Font Color Format" = "White"],
+				        [ProductKey = 3, Product = "Mountain Bike Socks, M", #"Standard Cost" = 3.40, Color = "White", Subcategory = "Socks", Category = "Clothing", #"Background Color Format" = "White", #"Font Color Format" = "Black"],
+				        [ProductKey = 4, Product = "Road-150 Red, 62", #"Standard Cost" = 2171.29, Color = "Red", Subcategory = "Road Bikes", Category = "Bikes", #"Background Color Format" = "#CC3300", #"Font Color Format" = "White"],
+				        [ProductKey = 5, Product = "Mountain-100 Silver, 38", #"Standard Cost" = 1912.15, Color = "Silver", Subcategory = "Mountain Bikes", Category = "Bikes", #"Background Color Format" = "Silver", #"Font Color Format" = "Black"],
+				        [ProductKey = 6, Product = "Touring-1000 Blue, 60", #"Standard Cost" = 2146.96, Color = "Blue", Subcategory = "Touring Bikes", Category = "Bikes", #"Background Color Format" = "#000080", #"Font Color Format" = "White"]
+				    }, type table [ProductKey = Int64.Type, Product = Text.Type, #"Standard Cost" = Decimal.Type, Color = Text.Type, Subcategory = Text.Type, Category = Text.Type, #"Background Color Format" = Text.Type, #"Font Color Format" = Text.Type])
+				in
+				    Source
 
