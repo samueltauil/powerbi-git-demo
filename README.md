@@ -4,6 +4,14 @@
 
 A demonstration Power BI project showing how to integrate a Power BI report and semantic model with GitHub using Microsoft Fabric's Git integration feature.
 
+```mermaid
+flowchart LR
+    A[Power BI Desktop / VS Code] -->|git push| B[(GitHub Repository)]
+    B -->|Git Sync| C[Fabric Workspace]
+    C -->|Semantic Model Refresh| D[Live Report]
+    C -.->|Commit write-back| B
+```
+
 ## Contents
 
 | Item | Description |
@@ -19,6 +27,14 @@ A demonstration Power BI project showing how to integrate a Power BI report and 
 - A Microsoft Fabric workspace (Trial, Power BI Premium, or Fabric capacity)
 - A GitHub account with your own fork of this repository
 - Fabric workspace Admin or Member role
+
+```mermaid
+flowchart LR
+    A["0. Fork + PAT"] --> B["1. Connect Workspace"]
+    B --> C["2. Sync Artifacts"]
+    C --> D["3. Refresh Model"]
+    D --> E["4. View Report"]
+```
 
 ### Step 0 — Fork This Repository and Create a GitHub PAT
 
@@ -100,6 +116,103 @@ Whenever changes are pushed to the `main` branch:
 2. Open `My new report.pbip` in Power BI Desktop (version 2.137+)
 3. Make edits and save — changes are written directly to the TMDL/PBIR source files
 4. Commit and push via Git to sync back to Fabric
+
+## Deployment Models with GitHub and Microsoft Fabric
+
+> Based on the official Microsoft guidance: [Choose the best Fabric CI/CD workflow option for you](https://learn.microsoft.com/en-us/fabric/cicd/manage-deployment?WT.mc_id=DP-MVP-5004032#development-process)
+
+This repo demonstrates the simplest form of Fabric Git integration, but production teams typically adopt one of the CI/CD patterns below depending on their scale and requirements.
+
+### Development Process (Common to All Options)
+
+Regardless of the deployment model, the development loop is the same: developers work in an isolated environment — either **Power BI Desktop / VS Code locally** or a **dedicated dev workspace** in Fabric — and commit changes to a feature branch. A Pull Request (PR) review process gates what gets merged into shared branches.
+
+```mermaid
+gitGraph
+   commit id: "initial commit"
+   branch feature/my-change
+   checkout feature/my-change
+   commit id: "edit report"
+   commit id: "update measure"
+   checkout main
+   merge feature/my-change id: "PR merged"
+```
+
+### Option 1 — Git-Based Deployments (Recommended for Most Teams)
+
+Each environment stage (Dev, Test, Prod) maps to a **dedicated Git branch** and a **dedicated Fabric workspace**. When a PR is merged into the Dev branch, a release pipeline automatically syncs that branch to the Dev workspace using the [Fabric Git APIs](https://learn.microsoft.com/en-us/rest/api/fabric/core/git/update-from-git). Promotion to Test and Prod happens via additional PRs through the same branch-per-stage pattern.
+
+**Best for:** Teams following **Gitflow**, where `main`/`dev`/`test` are long-lived branches.
+
+```mermaid
+flowchart TD
+    FB([Feature Branch]) -->|PR merge| DB[dev branch]
+    DB -->|Fabric Git API| DW[Dev Workspace]
+    DB -->|PR merge| TB[test branch]
+    TB -->|Fabric Git API| TW[Test Workspace]
+    TB -->|PR merge| MB[main branch]
+    MB -->|Fabric Git API| PW[Prod Workspace]
+```
+
+### Option 2 — Git-Based Deployments with Build Environments
+
+All deployments originate from a **single `main` branch**, but a **build environment** (e.g. a GitHub Actions runner) pre-processes the files before uploading them to each workspace — swapping out connection IDs, lakehouse IDs, or parameter values per stage. Uses the [fabric-cicd Python library](https://microsoft.github.io/fabric-cicd) or the [Fabric Item APIs](https://learn.microsoft.com/en-us/rest/api/fabric/core/items) to push changes.
+
+**Best for:** Teams following **trunk-based development** or who need environment-specific config substitution before deployment.
+
+```mermaid
+flowchart LR
+    FB([Feature Branch]) -->|PR merge| MB[main branch]
+    MB -->|triggers| BA{Build Environment}
+    BA -->|dev config + sync| DW[Dev Workspace]
+    BA -->|test config + sync| TW[Test Workspace]
+    BA -->|prod config + sync| PW[Prod Workspace]
+```
+
+### Option 3 — Git + Fabric Deployment Pipelines
+
+Git is connected only to the **Dev workspace**. Promotion from Dev → Test → Prod is handled by **Fabric's built-in deployment pipelines**, which can be triggered programmatically via the [deployment pipeline APIs](https://learn.microsoft.com/en-us/rest/api/fabric/core/deployment-pipelines) inside a GitHub Actions workflow.
+
+**Best for:** Teams who prefer Fabric-native tooling for cross-stage promotion and want visibility into deployment history inside Fabric.
+
+```mermaid
+flowchart LR
+    FB([Feature Branch]) -->|PR merge| MB[main branch]
+    MB -->|Git sync| DW[Dev Workspace]
+    DW -->|Deployment Pipeline| TW[Test Workspace]
+    TW -->|Deployment Pipeline| PW[Prod Workspace]
+```
+
+### Option 4 — ISV / Multi-Tenant Deployments
+
+An extension of Option 2 for **Independent Software Vendors (ISVs)** managing hundreds or thousands of customer workspaces. A single centralized Dev/Test process feeds into per-customer Prod workspaces, with customer-specific configuration injected at deployment time via scripts or APIs.
+
+**Best for:** SaaS providers building analytics solutions on top of Fabric at scale.
+
+```mermaid
+flowchart TD
+    MB[main branch] --> BA{CI Pipeline}
+    BA --> C1[Customer A]
+    BA --> C2[Customer B]
+    BA --> CN[Customer N]
+```
+
+### Which Option Fits This Repo?
+
+This demo uses **Option 1** in its simplest form — a single `main` branch connected directly to one Fabric workspace.
+
+```mermaid
+flowchart LR
+    MB[main branch] -->|Git Integration| FW[Your Fabric Workspace]
+```
+
+To evolve it into a full multi-stage pipeline, you would:
+
+1. Create `dev`, `test`, and `main` (prod) branches
+2. Connect each to its own Fabric workspace via Git integration
+3. Add a GitHub Actions workflow to automate workspace sync on PR merge using the Fabric Git APIs
+
+---
 
 ## License
 
