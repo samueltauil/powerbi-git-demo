@@ -131,15 +131,15 @@ Regardless of the deployment model, the development loop is the same: developers
 flowchart LR
     subgraph isolated ["Isolated Environment"]
         direction TB
-        IDE["Power BI Desktop\nor VS Code"]
-        DWS["Dev Workspace\n(personal)"]
+        IDE["Power BI Desktop<br/>or VS Code"]
+        DWS["Dev Workspace<br/>(personal)"]
     end
 
     subgraph git ["Source Control"]
         direction TB
-        FB(["Feature\nBranch"])
-        PR{"Pull Request\nReview & Approve"}
-        MAIN["Main / Dev\nBranch"]
+        FB(["Feature<br/>Branch"])
+        PR{"Pull Request<br/>Review & Approve"}
+        MAIN["Main / Dev<br/>Branch"]
     end
 
     isolated --> FB
@@ -155,28 +155,28 @@ Each environment stage (Dev, Test, Prod) maps to a **dedicated Git branch** and 
 
 ```mermaid
 flowchart TD
-    FB(["Feature\nBranch"]) -->|"PR merge"| DB
+    FB(["Feature<br/>Branch"]) -->|"PR merge"| DB
 
     subgraph dev ["Dev Stage"]
-        DB["dev branch"] --> DBP["Build Pipeline\n(unit tests)"]
-        DBP --> DRP["Release Pipeline\n(Git API sync)"]
-        DRP --> DW["Dev\nWorkspace"]
+        DB["dev branch"] --> DBP["Build Pipeline<br/>(unit tests)"]
+        DBP --> DRP["Release Pipeline<br/>(Git API sync)"]
+        DRP --> DW["Dev<br/>Workspace"]
     end
 
-    DB -->|"PR merge\n(release branch)"| TB
+    DB -->|"PR merge<br/>(release branch)"| TB
 
     subgraph test ["Test Stage"]
-        TB["test branch"] --> TBP["Build Pipeline\n(unit tests)"]
-        TBP --> TRP["Release Pipeline\n(Git API sync)"]
-        TRP --> TW["Test\nWorkspace"]
+        TB["test branch"] --> TBP["Build Pipeline<br/>(unit tests)"]
+        TBP --> TRP["Release Pipeline<br/>(Git API sync)"]
+        TRP --> TW["Test<br/>Workspace"]
     end
 
     TB -->|"PR merge"| MB
 
     subgraph prod ["Prod Stage"]
-        MB["main branch"] --> PBP["Build Pipeline\n(unit tests)"]
-        PBP --> PRP["Release Pipeline\n(Git API sync)"]
-        PRP --> PW["Prod\nWorkspace"]
+        MB["main branch"] --> PBP["Build Pipeline<br/>(unit tests)"]
+        PBP --> PRP["Release Pipeline<br/>(Git API sync)"]
+        PRP --> PW["Prod<br/>Workspace"]
     end
 
     style dev fill:#d4edda,stroke:#28a745
@@ -192,27 +192,27 @@ All deployments originate from a **single `main` branch**, but a **build environ
 
 ```mermaid
 flowchart TD
-    FB(["Feature\nBranch"]) -->|"PR merge"| MB["main branch"]
+    FB(["Feature<br/>Branch"]) -->|"PR merge"| MB["main branch"]
 
     MB --> DEV_BUILD
 
     subgraph dev ["Dev Stage"]
-        DEV_BUILD["Build Pipeline\n(unit tests)"] --> DEV_ENV["Build Environment\n(swap dev config)"]
-        DEV_ENV -->|"Item API\nupload"| DW["Dev\nWorkspace"]
+        DEV_BUILD["Build Pipeline<br/>(unit tests)"] --> DEV_ENV["Build Environment<br/>(swap dev config)"]
+        DEV_ENV -->|"Item API<br/>upload"| DW["Dev<br/>Workspace"]
     end
 
     MB --> TEST_BUILD
 
     subgraph test ["Test Stage"]
-        TEST_BUILD["Build Pipeline\n(unit tests)"] --> TEST_ENV["Build Environment\n(swap test config)"]
-        TEST_ENV -->|"Item API\nupload"| TW["Test\nWorkspace"]
+        TEST_BUILD["Build Pipeline<br/>(unit tests)"] --> TEST_ENV["Build Environment<br/>(swap test config)"]
+        TEST_ENV -->|"Item API<br/>upload"| TW["Test<br/>Workspace"]
     end
 
     MB --> PROD_BUILD
 
     subgraph prod ["Prod Stage"]
-        PROD_BUILD["Build Pipeline\n(unit tests)"] --> PROD_ENV["Build Environment\n(swap prod config)"]
-        PROD_ENV -->|"Item API\nupload"| PW["Prod\nWorkspace"]
+        PROD_BUILD["Build Pipeline<br/>(unit tests)"] --> PROD_ENV["Build Environment<br/>(swap prod config)"]
+        PROD_ENV -->|"Item API<br/>upload"| PW["Prod<br/>Workspace"]
     end
 
     DW -.->|"approval"| TEST_BUILD
@@ -232,14 +232,14 @@ Git is connected only to the **Dev workspace**. Promotion from Dev → Test → 
 ```mermaid
 flowchart LR
     subgraph git ["Source Control"]
-        FB(["Feature\nBranch"]) -->|"PR merge"| MB["main\nbranch"]
+        FB(["Feature<br/>Branch"]) -->|"PR merge"| MB["main<br/>branch"]
     end
 
-    MB -->|"Git API\nsync"| DW
+    MB -->|"Git API<br/>sync"| DW
 
     subgraph fabric ["Fabric Deployment Pipeline"]
-        DW["Dev\nWorkspace"] -->|"Deploy &\nApprove"| TW["Test\nWorkspace"]
-        TW -->|"Deploy &\nApprove"| PW["Prod\nWorkspace"]
+        DW["Dev<br/>Workspace"] -->|"Deploy &<br/>Approve"| TW["Test<br/>Workspace"]
+        TW -->|"Deploy &<br/>Approve"| PW["Prod<br/>Workspace"]
     end
 
     style git fill:#e7f1ff,stroke:#0366d6
@@ -254,23 +254,23 @@ An extension of Option 2 for **Independent Software Vendors (ISVs)** managing hu
 
 ```mermaid
 flowchart TD
-    FB(["Feature\nBranch"]) -->|"PR merge"| MB["main branch"]
+    FB(["Feature<br/>Branch"]) -->|"PR merge"| MB["main branch"]
 
     subgraph central ["Centralized Dev & Test"]
         direction LR
-        MB --> DEV_BUILD["Build +\nRelease"]
-        DEV_BUILD --> DW["Dev\nWorkspace"]
-        DW -.->|"approval"| TEST_BUILD["Build +\nRelease"]
-        TEST_BUILD --> TW["Test\nWorkspace"]
+        MB --> DEV_BUILD["Build +<br/>Release"]
+        DEV_BUILD --> DW["Dev<br/>Workspace"]
+        DW -.->|"approval"| TEST_BUILD["Build +<br/>Release"]
+        TEST_BUILD --> TW["Test<br/>Workspace"]
     end
 
     TW -.->|"approval"| PROD_PIPE
 
     subgraph customers ["Per-Customer Prod Workspaces"]
-        PROD_PIPE["Build + Release\n(per customer config)"] --> C1["Customer A\nWorkspace"]
-        PROD_PIPE --> C2["Customer B\nWorkspace"]
-        PROD_PIPE --> C3["Customer C\nWorkspace"]
-        PROD_PIPE --> CN["Customer N\nWorkspace"]
+        PROD_PIPE["Build + Release<br/>(per customer config)"] --> C1["Customer A<br/>Workspace"]
+        PROD_PIPE --> C2["Customer B<br/>Workspace"]
+        PROD_PIPE --> C3["Customer C<br/>Workspace"]
+        PROD_PIPE --> CN["Customer N<br/>Workspace"]
     end
 
     style central fill:#e7f1ff,stroke:#0366d6
@@ -284,20 +284,20 @@ This demo uses **Option 1** in its simplest form — a single `main` branch conn
 ```mermaid
 flowchart LR
     subgraph local ["Local Dev"]
-        PBI["Power BI\nDesktop"]
+        PBI["Power BI<br/>Desktop"]
     end
 
     subgraph git ["GitHub"]
-        MB["main\nbranch"]
+        MB["main<br/>branch"]
     end
 
     subgraph fabric ["Microsoft Fabric"]
-        FW["Your Fabric\nWorkspace"]
+        FW["Your Fabric<br/>Workspace"]
     end
 
     PBI -->|"git push"| MB
     MB -->|"Git Integration"| FW
-    FW -.->|"Commit\nwrite-back"| MB
+    FW -.->|"Commit<br/>write-back"| MB
 
     style local fill:#f0f0f0,stroke:#666
     style git fill:#e7f1ff,stroke:#0366d6
