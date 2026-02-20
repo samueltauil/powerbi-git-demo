@@ -5,6 +5,7 @@
 A demonstration Power BI project showing how to integrate a Power BI report and semantic model with GitHub using Microsoft Fabric's Git integration feature.
 
 ```mermaid
+%%{init: {'theme':'base', 'themeVariables': {'lineColor':'#333333','primaryTextColor':'#333','secondaryTextColor':'#333','tertiaryTextColor':'#333','primaryColor':'#e2e8f0','secondaryColor':'#f1f5f9'}}}%%
 flowchart LR
     A[Power BI Desktop / VS Code] -->|git push| B[(GitHub Repository)]
     B -->|Git Sync| C[Fabric Workspace]
@@ -29,6 +30,7 @@ flowchart LR
 - Fabric workspace Admin or Member role
 
 ```mermaid
+%%{init: {'theme':'base', 'themeVariables': {'lineColor':'#333333','primaryTextColor':'#333','secondaryTextColor':'#333','tertiaryTextColor':'#333','primaryColor':'#e2e8f0','secondaryColor':'#f1f5f9'}}}%%
 flowchart LR
     A["0. Fork + PAT"] --> B["1. Connect Workspace"]
     B --> C["2. Sync Artifacts"]
@@ -128,6 +130,7 @@ This repo demonstrates the simplest form of Fabric Git integration, but producti
 Regardless of the deployment model, the development loop is the same: developers work in an isolated environment — either **Power BI Desktop / VS Code locally** or a **dedicated dev workspace** in Fabric — and commit changes to a feature branch. A Pull Request (PR) review process gates what gets merged into shared branches.
 
 ```mermaid
+%%{init: {'theme':'base', 'themeVariables': {'lineColor':'#333333','primaryTextColor':'#333','secondaryTextColor':'#333','tertiaryTextColor':'#333','primaryColor':'#e2e8f0','secondaryColor':'#f1f5f9'}}}%%
 flowchart LR
     subgraph isolated ["Isolated Environment"]
         direction TB
@@ -154,6 +157,7 @@ Each environment stage (Dev, Test, Prod) maps to a **dedicated Git branch** and 
 **Best for:** Teams following **Gitflow**, where `main`/`dev`/`test` are long-lived branches.
 
 ```mermaid
+%%{init: {'theme':'base', 'themeVariables': {'lineColor':'#333333','primaryTextColor':'#333','secondaryTextColor':'#333','tertiaryTextColor':'#333','primaryColor':'#e2e8f0','secondaryColor':'#f1f5f9'}}}%%
 flowchart TD
     FB(["Feature<br/>Branch"]) -->|"PR merge"| DB
 
@@ -191,6 +195,7 @@ All deployments originate from a **single `main` branch**, but a **build environ
 **Best for:** Teams following **trunk-based development** or who need environment-specific config substitution before deployment.
 
 ```mermaid
+%%{init: {'theme':'base', 'themeVariables': {'lineColor':'#333333','primaryTextColor':'#333','secondaryTextColor':'#333','tertiaryTextColor':'#333','primaryColor':'#e2e8f0','secondaryColor':'#f1f5f9'}}}%%
 flowchart TD
     FB(["Feature<br/>Branch"]) -->|"PR merge"| MB["main branch"]
 
@@ -230,6 +235,7 @@ Git is connected only to the **Dev workspace**. Promotion from Dev → Test → 
 **Best for:** Teams who prefer Fabric-native tooling for cross-stage promotion and want visibility into deployment history inside Fabric.
 
 ```mermaid
+%%{init: {'theme':'base', 'themeVariables': {'lineColor':'#333333','primaryTextColor':'#333','secondaryTextColor':'#333','tertiaryTextColor':'#333','primaryColor':'#e2e8f0','secondaryColor':'#f1f5f9'}}}%%
 flowchart LR
     subgraph git ["Source Control"]
         FB(["Feature<br/>Branch"]) -->|"PR merge"| MB["main<br/>branch"]
@@ -253,6 +259,7 @@ An extension of Option 2 for **Independent Software Vendors (ISVs)** managing hu
 **Best for:** SaaS providers building analytics solutions on top of Fabric at scale.
 
 ```mermaid
+%%{init: {'theme':'base', 'themeVariables': {'lineColor':'#333333','primaryTextColor':'#333','secondaryTextColor':'#333','tertiaryTextColor':'#333','primaryColor':'#e2e8f0','secondaryColor':'#f1f5f9'}}}%%
 flowchart TD
     FB(["Feature<br/>Branch"]) -->|"PR merge"| MB["main branch"]
 
@@ -282,6 +289,7 @@ flowchart TD
 This demo uses **Option 1** in its simplest form — a single `main` branch connected directly to one Fabric workspace.
 
 ```mermaid
+%%{init: {'theme':'base', 'themeVariables': {'lineColor':'#333333','primaryTextColor':'#333','secondaryTextColor':'#333','tertiaryTextColor':'#333','primaryColor':'#e2e8f0','secondaryColor':'#f1f5f9'}}}%%
 flowchart LR
     subgraph local ["Local Dev"]
         PBI["Power BI<br/>Desktop"]
