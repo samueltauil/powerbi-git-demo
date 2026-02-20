@@ -179,9 +179,9 @@ flowchart TD
         PRP --> PW["Prod<br/>Workspace"]
     end
 
-    style dev fill:#d4edda,stroke:#28a745
-    style test fill:#fff3cd,stroke:#ffc107
-    style prod fill:#f8d7da,stroke:#dc3545
+    style dev fill:#d4edda,stroke:#28a745,color:#333
+    style test fill:#fff3cd,stroke:#ffc107,color:#333
+    style prod fill:#f8d7da,stroke:#dc3545,color:#333
 ```
 
 ### Option 2 — Git-Based Deployments with Build Environments
@@ -218,9 +218,9 @@ flowchart TD
     DW -.->|"approval"| TEST_BUILD
     TW -.->|"approval"| PROD_BUILD
 
-    style dev fill:#d4edda,stroke:#28a745
-    style test fill:#fff3cd,stroke:#ffc107
-    style prod fill:#f8d7da,stroke:#dc3545
+    style dev fill:#d4edda,stroke:#28a745,color:#333
+    style test fill:#fff3cd,stroke:#ffc107,color:#333
+    style prod fill:#f8d7da,stroke:#dc3545,color:#333
 ```
 
 ### Option 3 — Git + Fabric Deployment Pipelines
@@ -242,8 +242,8 @@ flowchart LR
         TW -->|"Deploy &<br/>Approve"| PW["Prod<br/>Workspace"]
     end
 
-    style git fill:#e7f1ff,stroke:#0366d6
-    style fabric fill:#f0e6ff,stroke:#6f42c1
+    style git fill:#e7f1ff,stroke:#0366d6,color:#333
+    style fabric fill:#f0e6ff,stroke:#6f42c1,color:#333
 ```
 
 ### Option 4 — ISV / Multi-Tenant Deployments
@@ -273,8 +273,8 @@ flowchart TD
         PROD_PIPE --> CN["Customer N<br/>Workspace"]
     end
 
-    style central fill:#e7f1ff,stroke:#0366d6
-    style customers fill:#f8d7da,stroke:#dc3545
+    style central fill:#e7f1ff,stroke:#0366d6,color:#333
+    style customers fill:#f8d7da,stroke:#dc3545,color:#333
 ```
 
 ### Which Option Fits This Repo?
@@ -299,9 +299,9 @@ flowchart LR
     MB -->|"Git Integration"| FW
     FW -.->|"Commit<br/>write-back"| MB
 
-    style local fill:#f0f0f0,stroke:#666
-    style git fill:#e7f1ff,stroke:#0366d6
-    style fabric fill:#d4edda,stroke:#28a745
+    style local fill:#f0f0f0,stroke:#666,color:#333
+    style git fill:#e7f1ff,stroke:#0366d6,color:#333
+    style fabric fill:#d4edda,stroke:#28a745,color:#333
 ```
 
 To evolve it into a full multi-stage pipeline, you would:
