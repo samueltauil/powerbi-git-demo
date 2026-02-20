@@ -1,5 +1,7 @@
 # Power BI Git Demo
 
+[![Fork this repo](https://img.shields.io/badge/Fork%20this%20repo-%E2%91%A0%20Start%20here-blue?style=for-the-badge&logo=github)](https://github.com/samueltauil/powerbi-git-demo/fork)
+
 A demonstration Power BI project showing how to integrate a Power BI report and semantic model with GitHub using Microsoft Fabric's Git integration feature.
 
 ## Contents
@@ -15,8 +17,32 @@ A demonstration Power BI project showing how to integrate a Power BI report and 
 ### Prerequisites
 
 - A Microsoft Fabric workspace (Trial, Power BI Premium, or Fabric capacity)
-- A GitHub account with access to this repository
+- A GitHub account with your own fork of this repository
 - Fabric workspace Admin or Member role
+
+### Step 0 — Fork This Repository and Create a GitHub PAT
+
+Fabric's Git integration requires **write access** to the repository (to commit changes back from Fabric). You must fork this repo into your own GitHub account and authenticate with a Personal Access Token (PAT).
+
+#### Fork the repository
+
+1. Click the **Fork this repo** button at the top of this page, or click **Fork** at the top right on GitHub
+2. Select your personal account as the destination
+3. Click **Create fork**
+
+#### Create a GitHub Personal Access Token (PAT)
+
+1. Go to **GitHub** → click your profile photo → **Settings**
+2. Scroll down to **Developer settings** → **Personal access tokens** → **Tokens (classic)**
+3. Click **Generate new token (classic)**
+4. Give it a descriptive name, e.g. `Fabric Git Integration`
+5. Set an expiration (90 days recommended)
+6. Under **Scopes**, check:
+   - `repo` (full control of private repositories)
+7. Click **Generate token**
+8. **Copy the token immediately** — you won't be able to see it again
+
+> Keep your PAT secure. Do not commit it to any file or share it publicly.
 
 ### Step 1 — Connect Your Fabric Workspace to GitHub
 
@@ -24,19 +50,24 @@ A demonstration Power BI project showing how to integrate a Power BI report and 
 2. Click **Workspace settings** (gear icon in the top right of the workspace)
 3. Select **Git integration** from the left menu
 4. Under **Git provider**, select **GitHub**
-5. Click **Connect to GitHub** and authorize Fabric to access your GitHub account
-6. Fill in the connection details:
-   - **Organization**: your GitHub username or org
-   - **Repository**: `powerbi-git-demo`
+5. Click **Connect to GitHub** and choose **Add account with a token**
+6. Paste your **GitHub PAT** from Step 0 and click **Add**
+7. Fill in the connection details:
+   - **Organization**: your GitHub username
+   - **Repository**: `powerbi-git-demo` (your fork)
    - **Branch**: `main`
    - **Git folder**: `/` (root)
-7. Click **Connect and sync**
+8. Click **Connect and sync**
+
+![Workspace Git integration settings](docs/workspace-settings.png)
 
 ### Step 2 — Initial Sync
 
 1. After connecting, Fabric will compare the workspace with the repository
 2. Click **Sync** to pull the report and semantic model into your workspace
 3. The items **My new report** (Report) and **My new report** (Semantic Model) will appear in your workspace
+
+![Artifacts synced to Fabric workspace](docs/artifacts-synced.png)
 
 ### Step 3 — Refresh the Semantic Model
 
@@ -46,6 +77,8 @@ After syncing, the semantic model is deployed but not yet loaded with data. You 
 2. Click the `...` menu → **Refresh now**
 3. Wait for the refresh to complete (status shows a green checkmark)
 4. Open the **My new report** report — it should now display data
+
+![Report displaying data after refresh](docs/report-view.png)
 
 ### Updating the Report from Git
 
