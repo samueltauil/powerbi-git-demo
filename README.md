@@ -17,11 +17,98 @@ flowchart LR
 
 | Item | Description |
 |---|---|
-| `My new report.Report/` | Power BI report definition (PBIR format) |
+| `My new report.Report/` | Power BI report definition (PBIR format) — contains the visual layout, theme, and static resources |
 | `My new report.SemanticModel/` | Semantic model definition (TMDL format) with embedded sample sales data |
 | `My new report.pbip` | Power BI project file for opening in Power BI Desktop |
+| `My new report.pbit` | Power BI Template — a portable version of the report without data (users are prompted for parameters on open) |
+| `Regional-Sales.pbit` | An additional Power BI Template with a regional sales report layout |
+| `docs/` | Screenshots used in this documentation |
+| `.gitignore` | Git ignore rules for Power BI local settings files |
+
+## Key Concepts / Glossary
+
+New to the Power BI / Microsoft Fabric ecosystem? This section defines the key terms used throughout this guide.
+
+| Term | Definition |
+|---|---|
+| **[Semantic Model](https://learn.microsoft.com/en-us/power-bi/connect-data/service-datasets-understand)** | The data layer of a Power BI report — defines tables, columns, relationships, and measures. Formerly called a "dataset." |
+| **[TMDL](https://learn.microsoft.com/en-us/analysis-services/tmdl/tmdl-overview)** | Tabular Model Definition Language — a human-readable, text-based format for defining semantic models, designed for Git-based source control. It replaces the older BIM/JSON format. |
+| **[PBIR](https://learn.microsoft.com/en-us/power-bi/developer/projects/projects-report)** | Power BI Report format — the text-based, deconstructed format for report layouts, replacing the binary `.pbix`. |
+| **[PBIP](https://learn.microsoft.com/en-us/power-bi/developer/projects/projects-overview)** | Power BI Project — a project file that points to the `.Report` and `.SemanticModel` folders, allowing Power BI Desktop to open them as an editable project. |
+| **PBIT** | Power BI Template — a portable template that includes report layout and model metadata but no data. Users are prompted for parameters when opening. |
+| **[Fabric Workspace](https://learn.microsoft.com/en-us/fabric/get-started/workspaces)** | A collaborative container in Microsoft Fabric that holds Power BI reports, semantic models, notebooks, and other items. Similar to a "project" in other platforms. |
+
+## .gitignore Explained
+
+When you open a `.pbip` project in Power BI Desktop, the tool generates local-only files under `.pbi/` directories. The `.gitignore` in this repo excludes:
+
+```
+**/.pbi/localSettings.json    # user-specific editor preferences
+**/.pbi/editorSettings.json   # user-specific editor preferences
+**/.pbi/cache.abf             # cached in-memory data (can be large)
+**/.pbi/unappliedChanges.json # staging file for uncommitted changes
+```
+
+These files are **machine-specific** and must never be committed — doing so would cause unnecessary merge conflicts and potentially expose local configuration. See [Power BI Projects and Git integration](https://learn.microsoft.com/en-us/power-bi/developer/projects/projects-git) for more details.
+
+## What the Report Shows
+
+The included report (`My new report`) contains a single page with the following visuals:
+
+- **Donut Chart** — Profit broken down by Product Category, giving a quick proportional view of which categories drive the most profit
+- **Image** — The Adventure Works company logo (used as a branding element in the report header)
+- **Table** — State-level data showing Population, Sales per Capita, and Sum of Sales, enabling geographic performance analysis
+
+This uses the Adventure Works sample data embedded directly in the semantic model (no external data source required).
+
+## Data Model Overview
+
+The semantic model contains 10 tables organized around a central **Sales** fact table.
+
+| Table | Role | Description |
+|---|---|---|
+| **Sales** | Fact | Sales transactions with keys to Product, Region, Reseller, Date, and Salesperson |
+| **Date** | Dimension | Date dimension table |
+| **Product** | Dimension | Product dimension with Category, Subcategory, etc. |
+| **Region** | Dimension | Sales territory dimension |
+| **Reseller** | Dimension | Reseller dimension |
+| **Salesperson** | Dimension | Salesperson dimension |
+| **Salesperson (Performance)** | Dimension | Salesperson performance tracking |
+| **SalespersonRegion** | Bridge | Junction table linking salespeople to regions |
+| **Targets** | Fact | Sales targets per employee per month |
+| **US Population** | Reference | State populations for per-capita analysis |
+
+```mermaid
+%%{init: {'theme':'base', 'themeVariables': {'lineColor':'#333333','primaryTextColor':'#333','secondaryTextColor':'#333','tertiaryTextColor':'#333','primaryColor':'#e2e8f0','secondaryColor':'#f1f5f9'}}}%%
+flowchart LR
+    Sales(["Sales (fact)"])
+    SPR(["SalespersonRegion (bridge)"])
+    SP["Salesperson (Performance)"]
+    USPop["US Population"]
+
+    Sales -->|ProductKey| Product
+    Sales -->|SalesTerritoryKey| Region
+    Sales -->|ResellerKey| Reseller
+    Sales -->|OrderDate| Date
+    Sales -->|EmployeeKey| Salesperson
+    SPR -->|EmployeeKey| SP
+    SPR <-->|SalesTerritoryKey| Region
+    Targets -->|EmployeeID| SP
+    Targets -->|TargetMonth| Date
+    Reseller <-->|"State-Province"| USPop
+```
+
+> Arrows with double heads (`<-->`) indicate **bidirectional** cross-filter relationships.
 
 ## Syncing This Repo to Microsoft Fabric
+
+### Compatibility / Requirements
+
+| Requirement | Minimum Version |
+|---|---|
+| Power BI Desktop | 2.137+ (October 2024 or later) |
+| Microsoft Fabric | Any capacity (Trial, Premium, or Fabric) |
+| PBIP format support | Enabled by default in Power BI Desktop 2.137+ |
 
 ### Prerequisites
 
@@ -60,7 +147,11 @@ Fabric's Git integration requires **write access** to the repository (to commit 
 7. Click **Generate token**
 8. **Copy the token immediately** — you won't be able to see it again
 
-> Keep your PAT secure. Do not commit it to any file or share it publicly.
+> **Security notes:**
+> - As of 2026, PATs are the **only** supported authentication method for Fabric ↔ GitHub integration (service principals and GitHub Apps are not yet supported).
+> - [Fine-grained personal access tokens](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#fine-grained-personal-access-tokens) are a more secure alternative to classic tokens and can be scoped to specific repositories.
+> - Store your PAT in a **password manager** and set a calendar reminder to rotate it before expiry.
+> - Keep your PAT secure. Do not commit it to any file or share it publicly.
 
 ### Step 1 — Connect Your Fabric Workspace to GitHub
 
@@ -317,6 +408,28 @@ To evolve it into a full multi-stage pipeline, you would:
 1. Create `dev`, `test`, and `main` (prod) branches
 2. Connect each to its own Fabric workspace via Git integration
 3. Add a GitHub Actions workflow to automate workspace sync on PR merge using the Fabric Git APIs
+
+---
+
+## Troubleshooting
+
+| Problem | Cause / Solution |
+|---|---|
+| Report shows blank / no data after sync | The semantic model needs to be refreshed (Step 3). Syncing deploys the model definition but does not load data. |
+| "Access denied" when connecting Fabric to GitHub | Your PAT may have expired or was created with insufficient scopes. Regenerate with the `repo` scope. |
+| Git sync shows conflicts | This happens when changes are made simultaneously in Fabric and locally. Resolve conflicts in Git before syncing again. |
+| `.pbip` file won't open in Power BI Desktop | You need Power BI Desktop version 2.137 or later. Update to the latest version. |
+| Semantic model refresh fails | Ensure the workspace has sufficient capacity and that any data source credentials are configured. |
+
+## Additional Resources
+
+| Resource | Link |
+|---|---|
+| Power BI Projects overview | [learn.microsoft.com](https://learn.microsoft.com/en-us/power-bi/developer/projects/projects-overview) |
+| TMDL overview | [learn.microsoft.com](https://learn.microsoft.com/en-us/analysis-services/tmdl/tmdl-overview) |
+| Get started with Fabric Git integration (GitHub) | [learn.microsoft.com](https://learn.microsoft.com/en-us/fabric/cicd/git-integration/git-get-started?tabs=github) |
+| Overview of Fabric Git integration | [learn.microsoft.com](https://learn.microsoft.com/en-us/fabric/cicd/git-integration/intro-to-git-integration) |
+| Automate Git integration with APIs | [learn.microsoft.com](https://learn.microsoft.com/en-us/fabric/cicd/git-integration/git-automation) |
 
 ---
 
