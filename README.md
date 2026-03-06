@@ -377,37 +377,59 @@ flowchart TD
 
 ### Which Option Fits This Repo?
 
-This demo uses **Option 1** in its simplest form — a single `main` branch connected directly to one Fabric workspace.
+This repo includes both modes:
+
+- **Basic mode** — A single `main` branch connected directly to one Fabric workspace via Fabric's Git integration (see [Syncing This Repo to Microsoft Fabric](#syncing-this-repo-to-microsoft-fabric)).
+- **Full CI/CD mode** — A multi-stage pipeline combining **Option 1** (branch-per-environment strategy) with **Option 2** (fabric-cicd parameter overrides). Ready-to-run pipelines are provided for both **GitHub Actions** and **Azure DevOps Pipelines**.
+
+### CI/CD Implementation
+
+This repo ships with a complete, demo-ready CI/CD setup that deploys Power BI items to environment-specific Fabric workspaces using the [`fabric-cicd`](https://microsoft.github.io/fabric-cicd) Python library.
 
 ```mermaid
 %%{init: {'theme':'base', 'themeVariables': {'lineColor':'#333333','primaryTextColor':'#333','secondaryTextColor':'#333','tertiaryTextColor':'#333','primaryColor':'#e2e8f0','secondaryColor':'#f1f5f9'}}}%%
 flowchart LR
-    subgraph local ["Local Dev"]
-        PBI["Power BI<br/>Desktop"]
+    subgraph branches ["Branches"]
+        DEV["dev"] -->|PR| TEST["test"] -->|PR| MAIN["main"]
     end
 
-    subgraph git ["GitHub"]
-        MB["main<br/>branch"]
+    subgraph pipeline ["CI/CD Pipeline"]
+        P["fabric-cicd<br/>+ parameter.yml"]
     end
 
     subgraph fabric ["Microsoft Fabric"]
-        FW["Your Fabric<br/>Workspace"]
+        DW["Dev Workspace"]
+        TW["Test Workspace"]
+        PW["Prod Workspace"]
     end
 
-    PBI -->|"git push"| MB
-    MB -->|"Git Integration"| FW
-    FW -.->|"Commit<br/>write-back"| MB
+    DEV  --> P --> DW
+    TEST --> P --> TW
+    MAIN --> P --> PW
 
-    style local fill:#f0f0f0,stroke:#666,color:#333
-    style git fill:#e7f1ff,stroke:#0366d6,color:#333
-    style fabric fill:#d4edda,stroke:#28a745,color:#333
+    style DW fill:#d4edda,stroke:#28a745
+    style TW fill:#fff3cd,stroke:#ffc107
+    style PW fill:#f8d7da,stroke:#dc3545
 ```
 
-To evolve it into a full multi-stage pipeline, you would:
+**How it works:** Source files always contain DEV values. When deploying to TEST or PROD, `fabric-cicd` reads `parameter.yml` and swaps environment-specific values (connection IDs, lakehouse references, etc.) at deployment time — no manual find-and-replace in PRs.
 
-1. Create `dev`, `test`, and `main` (prod) branches
-2. Connect each to its own Fabric workspace via Git integration
-3. Add a GitHub Actions workflow to automate workspace sync on PR merge using the Fabric Git APIs
+#### CI/CD Files
+
+| File | Purpose |
+|---|---|
+| `parameter.yml` | Environment-specific value overrides for `fabric-cicd` |
+| `.deploy/fabric_workspace.py` | Python deployment script (shared by both pipeline platforms) |
+| `requirements.txt` | Python dependencies (`fabric-cicd`, `azure-identity`) |
+| `.github/workflows/deploy-fabric.yml` | GitHub Actions workflow — triggers on push to `dev`/`test`/`main` |
+| `azure-pipelines/deploy-fabric.yml` | Azure Pipelines YAML — triggers on push to `dev`/`test`/`main` |
+
+#### Demo Guides
+
+Choose the platform you want to demo on:
+
+- **[GitHub Actions Demo](docs/GITHUB_DEMO.md)** — Full walkthrough using GitHub Environments and GitHub Actions
+- **[Azure DevOps Demo](docs/AZURE_DEVOPS_DEMO.md)** — Full walkthrough using Azure DevOps Service Connections, Variable Groups, and Azure Pipelines
 
 ---
 
