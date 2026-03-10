@@ -7,4 +7,3 @@ expression 'AdventureWorksDW' =
 		in
 			Source
 	lineageTag: f8a3e2b1-4c7d-4e9f-a2b3-c4d5e6f78901
-	queryGroup: 'Data Sources'
