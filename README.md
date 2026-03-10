@@ -414,6 +414,13 @@ flowchart LR
 
 **How it works:** Source files always contain DEV values. When deploying to TEST or PROD, `fabric-cicd` reads `parameter.yml` and swaps environment-specific values (connection IDs, lakehouse references, etc.) at deployment time — no manual find-and-replace in PRs.
 
+**How to validate the replaced values:**
+1. Install VS Code + the Fabric Studio extension.
+2. Log in to your Microsoft Fabric/Power BI account.
+3. In the Fabric Workspaces panel, expand your Semantic Model.
+4. Navigate to Definition folder > Definition folder > expressions.tmdl.
+5. The file will open showing the current live state of the deployed model — compare it against your git-committed version.
+
 #### CI/CD Files
 
 | File | Purpose |
