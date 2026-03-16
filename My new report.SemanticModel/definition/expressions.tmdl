@@ -1,4 +1,4 @@
-/// Shared connection to the AdventureWorks SQL database.
+/// Shared connection to the AdventureWorks SQL database.
 /// The ConnectionId below is the DEV environment value; fabric-cicd
 /// replaces it at deployment time using parameter.yml.
 expression 'AdventureWorksDW' =
