@@ -49,6 +49,11 @@ stages:
           - script: pip install -r requirements.txt
             displayName: "Install dependencies"
 
+          - script: |
+              sed -i "s|__TEST_CONNECTION_ID__|$(TEST_CONNECTION_ID)|g" parameter.yml
+              sed -i "s|__PROD_CONNECTION_ID__|$(PROD_CONNECTION_ID)|g" parameter.yml
+            displayName: "Replace parameter tokens from variable group"
+
           - task: AzureCLI@2
             displayName: "Deploy Fabric workspace"
             inputs:

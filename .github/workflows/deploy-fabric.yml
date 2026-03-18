@@ -58,6 +58,14 @@ jobs:
             *)    echo "::error::Unsupported branch"; exit 1 ;;
           esac
 
+      - name: Replace parameter tokens from secrets
+        run: |
+          sed -i "s|__TEST_CONNECTION_ID__|$TEST_CONNECTION_ID|g" parameter.yml
+          sed -i "s|__PROD_CONNECTION_ID__|$PROD_CONNECTION_ID|g" parameter.yml
+        env:
+          TEST_CONNECTION_ID: ${{ secrets.TEST_CONNECTION_ID }}
+          PROD_CONNECTION_ID: ${{ secrets.PROD_CONNECTION_ID }}
+
       - name: Deploy to Fabric workspace
         env:
           FABRIC_WORKSPACE_ID: ${{ secrets.FABRIC_WORKSPACE_ID }}

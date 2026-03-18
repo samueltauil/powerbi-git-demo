@@ -131,6 +131,8 @@ For each workspace (Dev, Test, Prod):
 | `DEV_WORKSPACE_ID` | Dev workspace GUID | No |
 | `TEST_WORKSPACE_ID` | Test workspace GUID | No |
 | `PROD_WORKSPACE_ID` | Prod workspace GUID | No |
+| `TEST_CONNECTION_ID` | Fabric connection GUID for the TEST semantic model | Yes |
+| `PROD_CONNECTION_ID` | Fabric connection GUID for the PROD semantic model | Yes |
 
 4. Click **Save**
 
@@ -153,16 +155,20 @@ For each workspace (Dev, Test, Prod):
 
 ## Step 7 — Update parameter.yml
 
-Edit `parameter.yml` in the repo root with your actual environment-specific values:
+The `parameter.yml` file uses placeholder tokens (`__TEST_CONNECTION_ID__`, `__PROD_CONNECTION_ID__`) instead of hard-coded connection GUIDs. The Azure Pipeline automatically replaces these tokens at deploy time using the variable group values from Step 5.
+
+Update the `find_value` to match your **DEV** connection ID (the ID found in your DEV workspace):
 
 ```yaml
 find_replace:
-    - find_value: "your-dev-connection-id"
+    - find_value: "your-dev-connection-id"       # DEV connection ID
       replace_value:
-          TEST: "your-test-connection-id"
-          PROD: "your-prod-connection-id"
+          TEST: "__TEST_CONNECTION_ID__"          # replaced by pipeline
+          PROD: "__PROD_CONNECTION_ID__"          # replaced by pipeline
       item_type: "SemanticModel"
 ```
+
+> **Note:** You only need to set the `find_value` to your real DEV connection GUID. The TEST and PROD values are injected at runtime from the Fabric-Deploy variable group — never commit real connection IDs for those environments.
 
 Commit and push to `dev`:
 ```bash
