@@ -120,6 +120,8 @@ For **each** environment (DEV, TEST, PROD), add these secrets:
 | `AZURE_CLIENT_SECRET` | App Registration client secret |
 | `AZURE_TENANT_ID` | Entra ID tenant ID |
 | `FABRIC_WORKSPACE_ID` | The target Fabric workspace GUID for this environment |
+| `TEST_CONNECTION_ID` | Fabric connection GUID for the TEST semantic model |
+| `PROD_CONNECTION_ID` | Fabric connection GUID for the PROD semantic model |
 
 > **Finding your workspace ID:** Open the workspace in Fabric → the URL contains the workspace ID:
 > `https://app.fabric.microsoft.com/groups/<workspace-id>/...`
@@ -128,16 +130,20 @@ For **each** environment (DEV, TEST, PROD), add these secrets:
 
 ## Step 5 — Update parameter.yml
 
-Edit `parameter.yml` in the repo root with your actual environment-specific values. Replace the placeholder GUIDs with real connection IDs from your Fabric workspaces.
+The `parameter.yml` file uses placeholder tokens (`__TEST_CONNECTION_ID__`, `__PROD_CONNECTION_ID__`) instead of hard-coded connection GUIDs. The GitHub Actions workflow automatically replaces these tokens at deploy time using the secrets you configured in Step 4.
+
+Update the `find_value` to match your **DEV** connection ID (the ID found in your DEV workspace):
 
 ```yaml
 find_replace:
-    - find_value: "your-dev-connection-id"
+    - find_value: "your-dev-connection-id"       # DEV connection ID
       replace_value:
-          TEST: "your-test-connection-id"
-          PROD: "your-prod-connection-id"
+          TEST: "__TEST_CONNECTION_ID__"          # replaced by pipeline
+          PROD: "__PROD_CONNECTION_ID__"          # replaced by pipeline
       item_type: "SemanticModel"
 ```
+
+> **Note:** You only need to set the `find_value` to your real DEV connection GUID. The TEST and PROD values are injected at runtime from GitHub Secrets — never commit real connection IDs for those environments.
 
 Commit and push to `dev`:
 ```bash
