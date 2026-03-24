@@ -414,6 +414,8 @@ flowchart LR
 
 **How it works:** Source files always contain DEV values. When deploying to TEST or PROD, `fabric-cicd` reads `parameter.yml` and swaps environment-specific values (connection IDs, lakehouse references, etc.) at deployment time — no manual find-and-replace in PRs.
 
+**Secure connection ID handling:** `parameter.yml` uses placeholder tokens (`__TEST_CONNECTION_ID__`, `__PROD_CONNECTION_ID__`) instead of hard-coded GUIDs for the TEST and PROD environments. The CI/CD pipeline replaces these tokens at runtime with real values sourced from **GitHub Secrets** (GitHub Actions) or a **Variable Group** (Azure Pipelines) — so sensitive connection IDs are never committed to the repository.
+
 **How to validate the replaced values:**
 1. Install VS Code + the Fabric Studio extension.
 2. Log in to your Microsoft Fabric/Power BI account.
@@ -425,11 +427,11 @@ flowchart LR
 
 | File | Purpose |
 |---|---|
-| `parameter.yml` | Environment-specific value overrides for `fabric-cicd` |
+| `parameter.yml` | Environment-specific value overrides for `fabric-cicd`; TEST/PROD connection IDs use `__PLACEHOLDER__` tokens replaced at runtime |
 | `.deploy/fabric_workspace.py` | Python deployment script (shared by both pipeline platforms) |
 | `requirements.txt` | Python dependencies (`fabric-cicd`, `azure-identity`) |
-| `.github/workflows/deploy-fabric.yml` | GitHub Actions workflow — triggers on push to `dev`/`test`/`main` |
-| `azure-pipelines/deploy-fabric.yml` | Azure Pipelines YAML — triggers on push to `dev`/`test`/`main` |
+| `.github/workflows/deploy-fabric.yml` | GitHub Actions workflow — triggers on push to `dev`/`test`/`main`; replaces connection ID tokens from `TEST_CONNECTION_ID` / `PROD_CONNECTION_ID` secrets |
+| `azure-pipelines/deploy-fabric.yml` | Azure Pipelines YAML — triggers on push to `dev`/`test`/`main`; replaces connection ID tokens from the `Fabric-Deploy` variable group |
 
 #### Demo Guides
 
