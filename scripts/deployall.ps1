@@ -46,6 +46,8 @@ try {
     } while ($op.status -in @('NotStarted', 'Executing'))
 
     if ($op.status -ne 'Succeeded') {
+        Write-Host "---- Deployment details ----"
+        $op | ConvertTo-Json -Depth 10 | Write-Host
         throw "Deployment finished with status '$($op.status)'."
     }
     Write-Host "Deployment succeeded."
